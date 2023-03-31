@@ -1,0 +1,58 @@
+steps:
+  - read: name
+    from: env.name
+    fallback:
+      from: git.name
+      fallback:
+        prompt: "Enter the pretty URL for the module."
+
+  - read: module_name
+    from: env.module_name
+    fallback:
+      from: git.module_name
+      fallback:
+        prompt: "Enter the module name, starting with the prefix \"pr_\"."
+
+  - read: install_directory
+    from: env.install_directory
+    fallback:
+      from: git.install_directory
+      fallback:
+        prompt: "Where should the module be installed to? Default: \"modules/\""
+
+  - read: git_url
+    from: env.git_url
+    fallback:
+      from: git.git_url
+      fallback:
+        prompt: What is the git clone URL for the repository?
+
+  - read: github_url
+    from: env.github_url
+    fallback:
+      from: git.github_url
+      fallback:
+        prompt: What is the GitHub URL for the repository?
+
+  - copy: README.tmpl.md
+    to: README.md
+  - copy: CMakeInstall.txt.tmpl
+    to: CMakeInstall.txt
+  - copy: src/pr_module.cpp.tmpl
+    to: src/pr_module.cpp
+  - copy: .github/pragma_module_info.json.tmpl
+    to: .github/pragma_module_info.json
+  - copy: CMakeLists.txt.tmpl
+    to: CMakeLists.txt
+  - copy: examples/ex_load_pragma_module.tmpl.lua
+    to: examples/ex_load_pragma_module.lua
+
+  - remove: README.tmpl.md
+  - remove: CMakeInstall.txt.tmpl
+  - remove: src/pr_module.cpp.tmpl
+  - remove: .github/pragma_module_info.json.tmpl
+  - remove: CMakeLists.txt.tmpl
+  - remove: template_pragma_module.json
+  - remove: examples/ex_load_pragma_module.tmpl.lua
+  - remove: .gitignore
+  - remove: github_actions

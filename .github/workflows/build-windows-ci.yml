@@ -1,0 +1,54 @@
+name: Build Windows
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  repository_dispatch:
+    types: [init]
+
+concurrency:
+  group: environment-win-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build - ${{ matrix.config.os }}
+    if: github.repository != 'Silverlan/pr_module_template'
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - os: windows-latest
+            name: "Windows x64 MSVC"
+            artifact: "Windows-MSVC.tar.xz"
+            build_type: "RelWithDebInfo"
+            environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+            cc: "cl"
+            cxx: "cl"
+            archiver: "7z a"
+            generators: "Visual Studio 16 2022"
+            build_dir: 'build'
+    steps:
+      - name: Get Module Info
+        id: module-info
+        uses: Silverlan/pr_module_template/github_actions/get_module_info@main
+
+      - name: Build Module
+        id: build-module
+        uses: Silverlan/pragma/github_actions/build_generic_module@master
+        with:
+          module: '${{ steps.module-info.outputs.module_name }}'
+
+      - name: Create Release Files
+        shell: bash
+        run: |
+          mkdir -p release/${{ steps.module-info.outputs.install_directory }}
+          cp "${{ steps.build-module.outputs.install-dir }}/modules/${{ steps.module-info.outputs.module_name }}.dll" "release/${{ steps.module-info.outputs.install_directory }}"
+
+      - name: Release Binaries
+        uses: Silverlan/common_actions/release_nightly_binaries@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit: ${{ github.ref_name }}

@@ -1,0 +1,32 @@
+name: Create Stable Release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Publish Release
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - os: ubuntu-22.04
+            name: "Ubuntu GCC-11"
+            artifact: "ubuntu_gcc.7z"
+            build_type: "RelWithDebInfo"
+            cc: "clang-14"
+            cxx: "clang++-14"
+            archiver: "7z a"
+            generators: "Unix Makefiles"
+            build_dir: 'build'
+    steps:
+      - name: Publish Release
+        uses: Silverlan/pr_module_template/github_actions/publish_release@main
+        with:
+          version: ${{ inputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}

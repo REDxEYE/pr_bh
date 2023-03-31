@@ -1,0 +1,43 @@
+name: Setup repository
+on:
+  push:
+    paths:
+      - template_pragma_module.json
+jobs:
+  build:
+    if: github.repository != 'Silverlan/pr_module_template'
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Get Module Info
+        id: module-info
+        uses: Silverlan/pr_module_template/github_actions/get_module_info@main
+        with:
+          filepath: './template_pragma_module.json'
+
+      - id: template_exists
+        name: Check template
+        uses: andstor/file-existence-action@v1
+        with:
+          files: .tmplr.yml
+
+      - name: Apply template
+        if: steps.template_exists.outputs.files_exists == 'true'
+        run: npx tmplr && rm -fr .tmplr.yml && rm -fr .github/workflows/init.yml
+        env:
+          name: ${{ steps.module-info.outputs.name }}
+          module_name: ${{ steps.module-info.outputs.module_name }}
+          install_directory: ${{ steps.module-info.outputs.install_directory }}
+          git_url: https://github.com/${{ github.repository }}.git
+          github_url: https://github.com/${{ github.repository }}
+
+      - uses: EndBug/add-and-commit@v9
+        with:
+          message: Initialize from template
+
+      - name: Trigger Build Workflows
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          event-type: init

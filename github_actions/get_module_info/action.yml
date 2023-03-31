@@ -1,0 +1,50 @@
+name: Get Module Info
+description: 'Get Pragma Module Info'
+inputs:
+  filepath:
+    description: 'Path to json file'
+    required: true
+    default: ''
+outputs:
+  name:
+    description: 'Pretty name of the module'
+    value: ${{ steps.json.outputs.name }}
+  module_name:
+    description: 'Name of the module.'
+    value: ${{ steps.json.outputs.module_name }}
+  install_directory:
+    description: 'Where the module should be installed to.'
+    value: ${{ steps.json.outputs.install_directory }}
+runs:
+  using: "composite"
+  steps:
+    - name: Load json values
+      id: json
+      shell: bash
+      run: |
+        filepath=${{ inputs.filepath }}
+        remFile=0
+        if [ -z "$filepath" ]; then
+          curl https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$GITHUB_REF_NAME/.github/pragma_module_info.json -o pragma_module_info.json
+          filepath="pragma_module_info.json"
+
+          remFile=1
+        fi
+        function getVal {
+          val=$(cat $filepath | jq $1)
+          temp="${val%\"}"
+          temp="${temp#\"}"
+          val=$temp
+          echo $val
+        }
+        name=$( getVal '.name' )
+        module_name=$( getVal '.module_name' )
+        install_directory=$( getVal '.install_directory' )
+
+        echo "name=$name" >> $GITHUB_OUTPUT
+        echo "module_name=$module_name" >> $GITHUB_OUTPUT
+        echo "install_directory=$install_directory" >> $GITHUB_OUTPUT
+
+        if [ "$remFile" -eq "1" ]; then
+          rm -f "$filepath"
+        fi
