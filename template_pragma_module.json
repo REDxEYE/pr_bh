@@ -1,5 +1,5 @@
 {
-    "name": "Project Name",
-    "module_name": "pr_module",
+    "name": "Bionicle:Heroes loader",
+    "module_name": "pr_bh",
     "install_directory": "modules/"
 }
