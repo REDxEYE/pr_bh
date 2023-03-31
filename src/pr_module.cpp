@@ -10,20 +10,20 @@ extern "C"
     {
         // Return true to indicate that the module has been loaded successfully.
         // If the module could not be loaded properly, return false and populate 'outErr' with a descriptive error message.
-        Con::cout<<"Custom module \"{{ tmplr.module_name }}\" has been loaded!"<<Con::endl;
+        Con::cout<<"Custom module \"pr_bh\" has been loaded!"<<Con::endl;
         return true;
     }
 
     // Called when the module is about to be unloaded
     DLLEXPORT void pragma_detach()
     {
-        Con::cout<<"Custom module \"{{ tmplr.module_name }}\" is about to be unloaded!"<<Con::endl;
+        Con::cout<<"Custom module \"pr_bh\" is about to be unloaded!"<<Con::endl;
     }
 
     // Lua bindings can be initialized here
     DLLEXPORT void pragma_initialize_lua(Lua::Interface &lua)
     {
-        auto &libDemo = lua.RegisterLibrary("{{ tmplr.module_name }}");
+        auto &libDemo = lua.RegisterLibrary("pr_bh");
         libDemo[luabind::def("print",+[]() {
             Con::cout<<"Hello World"<<Con::endl;
         })];

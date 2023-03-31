@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 include("./CMakeShared.txt")
 
-set(PROJ_NAME {{ tmplr.module_name }})
+set(PROJ_NAME pr_bh)
 
 project(${PROJ_NAME} CXX)
 
